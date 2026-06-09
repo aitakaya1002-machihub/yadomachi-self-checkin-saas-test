@@ -26,6 +26,7 @@ export async function createReservationAction(
     property_name: values.propertyName,
     reservation_code: createReservationCode(),
     pin_code: values.pinCode,
+    guest_access_token: createGuestAccessToken(),
     notes: values.notes || null,
     status: "pin_set",
   };
@@ -116,4 +117,8 @@ function validateReservation(values: Record<string, string>): ReservationFormErr
 function createReservationCode() {
   const random = crypto.randomUUID().slice(0, 8).toUpperCase();
   return `YM-${random}`;
+}
+
+function createGuestAccessToken() {
+  return crypto.randomUUID();
 }
