@@ -4,10 +4,8 @@ import { useActionState } from "react";
 import { Save } from "lucide-react";
 import { FormField } from "@/components/common/form-field";
 import { Button } from "@/components/ui/button";
-import {
-  createReservationAction,
-  initialFormState,
-} from "./actions";
+import { createReservationAction } from "./actions";
+import { initialFormState } from "./form-state";
 
 export function ReservationForm() {
   const [state, formAction, isPending] = useActionState(

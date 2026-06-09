@@ -11,7 +11,8 @@ import {
   type MailTemplateVariables,
 } from "@/lib/mail/template";
 import type { Settings } from "@/types/reservation";
-import { initialSettingsFormState, saveSettingsAction } from "./actions";
+import { saveSettingsAction } from "./actions";
+import { initialSettingsFormState } from "./form-state";
 
 const sampleVariables: MailTemplateVariables = {
   guest_name: "山田 太郎",

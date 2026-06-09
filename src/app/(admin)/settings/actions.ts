@@ -6,31 +6,7 @@ import {
   defaultEmailBodyTemplate,
   defaultEmailSubjectTemplate,
 } from "@/lib/mail/template";
-
-type SettingsFormState = {
-  ok: boolean;
-  message: string;
-  errors: Partial<
-    Record<
-      | "propertyName"
-      | "address"
-      | "emergencyContact"
-      | "senderName"
-      | "emailSubjectTemplate"
-      | "emailBodyTemplate"
-      | "cautionText",
-      string
-    >
-  >;
-  values: Record<string, string>;
-};
-
-export const initialSettingsFormState: SettingsFormState = {
-  ok: false,
-  message: "",
-  errors: {},
-  values: {},
-};
+import type { SettingsFormState } from "./form-state";
 
 export async function saveSettingsAction(
   _prevState: SettingsFormState,

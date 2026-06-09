@@ -3,32 +3,7 @@
 import { redirect } from "next/navigation";
 import { createReservation } from "@/lib/db/reservations";
 import type { ReservationInsert } from "@/types/reservation";
-
-export type ReservationFormErrors = Partial<
-  Record<
-    | "guestName"
-    | "guestEmail"
-    | "guestPhone"
-    | "checkinDate"
-    | "checkoutDate"
-    | "guestCount"
-    | "propertyName"
-    | "notes"
-    | "pinCode"
-    | "form",
-    string
-  >
->;
-
-export type ReservationFormState = {
-  errors: ReservationFormErrors;
-  values: Record<string, string>;
-};
-
-const initialFormState: ReservationFormState = {
-  errors: {},
-  values: {},
-};
+import type { ReservationFormErrors, ReservationFormState } from "./form-state";
 
 export async function createReservationAction(
   _prevState: ReservationFormState,
@@ -74,8 +49,6 @@ export async function createReservationAction(
 
   redirect(`/reservations/${reservationId}?created=1`);
 }
-
-export { initialFormState };
 
 function getFormValues(formData: FormData) {
   return {
