@@ -72,6 +72,7 @@ export type Database = {
           sent_at: string | null;
           send_status: Database["public"]["Enums"]["mail_send_status"];
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
@@ -81,6 +82,7 @@ export type Database = {
           sent_at?: string | null;
           send_status?: Database["public"]["Enums"]["mail_send_status"];
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
@@ -90,6 +92,7 @@ export type Database = {
           sent_at?: string | null;
           send_status?: Database["public"]["Enums"]["mail_send_status"];
           created_at?: string;
+          updated_at?: string;
         };
         Relationships: [
           {

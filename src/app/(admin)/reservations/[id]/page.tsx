@@ -39,6 +39,26 @@ export default async function ReservationDetailPage({
   const { id } = await params;
   const query = await searchParams;
   const reservation = await getReservationDetailById(id);
+
+  if (!reservation) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="予約が見つかりません"
+          description="指定された予約は存在しないか、削除されています。"
+          actions={
+            <Button asChild variant="outline">
+              <Link href="/reservations">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                一覧へ戻る
+              </Link>
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const guestUrl = `${appUrl}/guest/checkin/${reservation.guest_access_token}`;
   const hasSentMail = reservation.mail_logs.some((mailLog) => mailLog.send_status === "sent");
@@ -123,7 +143,7 @@ export default async function ReservationDetailPage({
                   </TableBody>
                 </Table>
               ) : (
-                <p className="text-sm text-muted-foreground">まだ案内メールは送信されていません。</p>
+                <p className="text-sm text-muted-foreground">送信履歴なし</p>
               )}
             </CardContent>
           </Card>

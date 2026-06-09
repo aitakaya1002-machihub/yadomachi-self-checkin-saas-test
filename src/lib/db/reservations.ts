@@ -127,21 +127,37 @@ export async function getReservationById(id: string): Promise<ReservationRow> {
   return data;
 }
 
-export async function getReservationDetailById(id: string): Promise<ReservationDetail> {
+export async function getReservationDetailById(id: string): Promise<ReservationDetail | null> {
   const supabase = await createServerSupabaseClient();
 
-  const { data, error } = await supabase
+  const { data: reservation, error } = await supabase
     .from("reservations")
-    .select("*, mail_logs(*)")
+    .select("*")
     .eq("id", id)
-    .order("created_at", { referencedTable: "mail_logs", ascending: false })
-    .single();
+    .maybeSingle();
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data;
+  if (!reservation) {
+    return null;
+  }
+
+  const { data: mailLogs, error: mailLogsError } = await supabase
+    .from("mail_logs")
+    .select("*")
+    .eq("reservation_id", id)
+    .order("created_at", { ascending: false });
+
+  if (mailLogsError) {
+    throw new Error(mailLogsError.message);
+  }
+
+  return {
+    ...reservation,
+    mail_logs: mailLogs ?? [],
+  };
 }
 
 export async function getReservationByGuestToken(guestToken: string) {

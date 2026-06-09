@@ -63,6 +63,7 @@ create table if not exists public.mail_logs (
   sent_at timestamptz,
   send_status public.mail_send_status not null default 'pending',
   created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
   constraint mail_logs_sent_at_required_chk
     check (send_status <> 'sent' or sent_at is not null)
 );
@@ -119,6 +120,12 @@ $$;
 drop trigger if exists reservations_set_updated_at on public.reservations;
 create trigger reservations_set_updated_at
 before update on public.reservations
+for each row
+execute function public.set_updated_at();
+
+drop trigger if exists mail_logs_set_updated_at on public.mail_logs;
+create trigger mail_logs_set_updated_at
+before update on public.mail_logs
 for each row
 execute function public.set_updated_at();
 
