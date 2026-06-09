@@ -1,4 +1,3 @@
-import { notFound } from "next/navigation";
 import { AlertTriangle, CalendarDays, KeyRound, MapPin, Phone } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getReservationByGuestToken } from "@/lib/db/reservations";
@@ -13,6 +12,24 @@ type GuestCheckinPageProps = {
 export default async function GuestCheckinPage({ params }: GuestCheckinPageProps) {
   const { token } = await params;
   const { reservation, settings } = await loadGuestCheckinData(token);
+
+  if (!reservation) {
+    return (
+      <main className="min-h-screen bg-slate-50 px-4 py-8">
+        <div className="mx-auto max-w-xl">
+          <div className="rounded-xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200">
+            <h1 className="text-2xl font-bold text-slate-950">
+              チェックイン情報が見つかりません
+            </h1>
+            <p className="mt-3 text-base leading-7 text-slate-600">
+              URLが正しいか、案内メールに記載されたリンクをもう一度ご確認ください。
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   const checkinGuide = [settings?.checkin_guide_text, reservation.checkin_time_note]
     .filter(Boolean)
     .join("\n\n");
@@ -59,6 +76,7 @@ export default async function GuestCheckinPage({ params }: GuestCheckinPageProps
           <CardContent className="grid gap-3 text-lg">
             <InfoRow label="チェックイン" value={formatDate(reservation.checkin_date)} />
             <InfoRow label="チェックアウト" value={formatDate(reservation.checkout_date)} />
+            <InfoRow label="人数" value={`${reservation.guest_count}名`} />
           </CardContent>
         </Card>
 
@@ -111,7 +129,7 @@ async function loadGuestCheckinData(token: string) {
 
     return { reservation, settings };
   } catch {
-    notFound();
+    return { reservation: null, settings: null };
   }
 }
 

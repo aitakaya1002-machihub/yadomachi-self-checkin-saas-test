@@ -1,5 +1,4 @@
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/admin";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Tables, TablesInsert, TablesUpdate } from "@/types/database";
 
 export type SettingsRow = Tables<"settings">;
@@ -7,7 +6,7 @@ export type SettingsInsert = TablesInsert<"settings">;
 export type SettingsUpdate = TablesUpdate<"settings">;
 
 export async function getSettings() {
-  const supabase = await createServerSupabaseClient();
+  const supabase = createServiceRoleSupabaseClient();
 
   const { data, error } = await supabase
     .from("settings")

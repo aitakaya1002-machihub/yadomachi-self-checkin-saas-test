@@ -184,13 +184,13 @@ export async function getReservationDetailById(id: string): Promise<ReservationD
 }
 
 export async function getReservationByGuestToken(guestToken: string) {
-  const supabase = await createServerSupabaseClient();
+  const supabase = createServiceRoleSupabaseClient();
 
   const { data, error } = await supabase
     .from("reservations")
     .select("*")
     .eq("guest_access_token", guestToken)
-    .single();
+    .maybeSingle();
 
   if (error) {
     throw new Error(error.message);
