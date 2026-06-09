@@ -1,3 +1,5 @@
+import { normalizeSupabaseUrl } from "./url";
+
 type SupabasePublicEnv = {
   url: string;
   anonKey: string;
@@ -19,7 +21,7 @@ function requireEnv(name: string) {
 
 export function getSupabasePublicEnv(): SupabasePublicEnv {
   return {
-    url: requireEnv("NEXT_PUBLIC_SUPABASE_URL"),
+    url: normalizeSupabaseUrl(requireEnv("NEXT_PUBLIC_SUPABASE_URL")),
     anonKey: requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
   };
 }

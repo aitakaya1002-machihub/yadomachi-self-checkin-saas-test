@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/types/database";
+import { normalizeSupabaseUrl } from "./url";
 
 const protectedPrefixes = ["/dashboard", "/reservations", "/settings", "/api/reservations"];
 
@@ -16,7 +17,7 @@ export async function updateSession(request: NextRequest) {
     return response;
   }
 
-  const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+  const supabase = createServerClient<Database>(normalizeSupabaseUrl(supabaseUrl), supabaseAnonKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();

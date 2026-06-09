@@ -2,6 +2,7 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "@/types/database";
+import { normalizeSupabaseUrl } from "./url";
 
 export function createBrowserSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -11,5 +12,5 @@ export function createBrowserSupabaseClient() {
     throw new Error("Supabase public environment variables are not set.");
   }
 
-  return createBrowserClient<Database>(url, anonKey);
+  return createBrowserClient<Database>(normalizeSupabaseUrl(url), anonKey);
 }

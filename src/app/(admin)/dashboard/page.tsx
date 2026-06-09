@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { listReservations, type ReservationListItem } from "@/lib/db/reservations";
 
+export const dynamic = "force-dynamic";
+
 const today = getTokyoDateString(0);
 const upcomingEnd = getTokyoDateString(7);
 

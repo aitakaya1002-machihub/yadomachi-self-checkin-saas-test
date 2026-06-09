@@ -46,7 +46,7 @@ export async function listReservations({
   sort = "checkin_date",
   direction = "asc",
 }: ListReservationsParams = {}): Promise<ReservationListItem[]> {
-  const supabase = await createServerSupabaseClient();
+  const supabase = createServiceRoleSupabaseClient();
 
   let reservationsQuery = supabase
     .from("reservations")

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowDown, ArrowUp, Plus, Search } from "lucide-react";
+import { AlertCircle, ArrowDown, ArrowUp, Plus, Search } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { MailStatusBadge } from "@/components/common/mail-status-badge";
 import { PageHeader } from "@/components/common/page-header";
@@ -22,6 +22,8 @@ import {
   type SortDirection,
 } from "@/lib/db/reservations";
 import { cn } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
 
 type ReservationsPageProps = {
   searchParams?: Promise<{
@@ -58,7 +60,7 @@ export default async function ReservationsPage({ searchParams }: ReservationsPag
   const query = params?.q ?? "";
   const sort = parseSortKey(params?.sort);
   const direction = parseDirection(params?.direction);
-  const reservations = await loadReservations({ query, sort, direction });
+  const { reservations, errorMessage } = await loadReservations({ query, sort, direction });
   const hasUnresolvedReservations = reservations.some(isUnresolvedReservation);
 
   return (
@@ -79,6 +81,16 @@ export default async function ReservationsPage({ searchParams }: ReservationsPag
       {hasUnresolvedReservations ? (
         <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
           未送信または準備中の予約があります。ステータスとメール送信状況を確認してください。
+        </div>
+      ) : null}
+
+      {errorMessage ? (
+        <div className="flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-rose-900">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
+          <div>
+            <div className="font-semibold">予約一覧を取得できませんでした</div>
+            <div className="mt-1 text-sm">{errorMessage}</div>
+          </div>
         </div>
       ) : null}
 
@@ -104,7 +116,7 @@ export default async function ReservationsPage({ searchParams }: ReservationsPag
           </form>
         </CardHeader>
         <CardContent>
-          {reservations.length > 0 ? (
+          {!errorMessage && reservations.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -153,7 +165,7 @@ export default async function ReservationsPage({ searchParams }: ReservationsPag
                 ))}
               </TableBody>
             </Table>
-          ) : (
+          ) : !errorMessage ? (
             <EmptyState
               title={query ? "条件に一致する予約がありません" : "予約がまだありません"}
               description={
@@ -167,7 +179,7 @@ export default async function ReservationsPage({ searchParams }: ReservationsPag
                 </Button>
               }
             />
-          )}
+          ) : null}
         </CardContent>
       </Card>
     </div>
@@ -184,13 +196,15 @@ async function loadReservations({
   direction: SortDirection;
 }) {
   try {
-    return await listReservations({ query, sort, direction });
+    return {
+      reservations: await listReservations({ query, sort, direction }),
+      errorMessage: null,
+    };
   } catch (error) {
-    if (error instanceof Error && error.message.includes("SUPABASE")) {
-      return [];
-    }
-
-    throw error;
+    return {
+      reservations: [],
+      errorMessage: error instanceof Error ? error.message : "不明なエラーが発生しました。",
+    };
   }
 }
 
