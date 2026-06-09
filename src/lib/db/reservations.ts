@@ -12,6 +12,12 @@ export type ReservationDetail = ReservationRow & {
   mail_logs: MailLogRow[];
 };
 
+export type ReservationDetailLookupResult = {
+  reservation: ReservationDetail | null;
+  reservationCount: number;
+  errorMessage: string | null;
+};
+
 export type ReservationSortKey =
   | "checkin_date"
   | "checkout_date"
@@ -127,21 +133,30 @@ export async function getReservationById(id: string): Promise<ReservationRow> {
   return data;
 }
 
-export async function getReservationDetailById(id: string): Promise<ReservationDetail | null> {
-  const supabase = await createServerSupabaseClient();
+export async function getReservationDetailById(id: string): Promise<ReservationDetailLookupResult> {
+  const supabase = createServiceRoleSupabaseClient();
 
-  const { data: reservation, error } = await supabase
+  const { data: reservations, error, count } = await supabase
     .from("reservations")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+    .select("*", { count: "exact" })
+    .eq("id", id);
 
   if (error) {
-    throw new Error(error.message);
+    return {
+      reservation: null,
+      reservationCount: 0,
+      errorMessage: error.message,
+    };
   }
 
+  const reservation = reservations[0] ?? null;
+
   if (!reservation) {
-    return null;
+    return {
+      reservation: null,
+      reservationCount: count ?? 0,
+      errorMessage: null,
+    };
   }
 
   const { data: mailLogs, error: mailLogsError } = await supabase
@@ -151,12 +166,20 @@ export async function getReservationDetailById(id: string): Promise<ReservationD
     .order("created_at", { ascending: false });
 
   if (mailLogsError) {
-    throw new Error(mailLogsError.message);
+    return {
+      reservation: null,
+      reservationCount: count ?? reservations.length,
+      errorMessage: mailLogsError.message,
+    };
   }
 
   return {
-    ...reservation,
-    mail_logs: mailLogs ?? [],
+    reservation: {
+      ...reservation,
+      mail_logs: mailLogs ?? [],
+    },
+    reservationCount: count ?? reservations.length,
+    errorMessage: null,
   };
 }
 

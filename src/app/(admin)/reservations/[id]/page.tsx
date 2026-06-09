@@ -38,11 +38,23 @@ export default async function ReservationDetailPage({
 }: ReservationDetailPageProps) {
   const { id } = await params;
   const query = await searchParams;
-  const reservation = await getReservationDetailById(id);
+  const {
+    reservation,
+    reservationCount,
+    errorMessage: reservationErrorMessage,
+  } = await getReservationDetailById(id);
+  const debugInfo = (
+    <ReservationDebugInfo
+      paramsId={id}
+      reservationCount={reservationCount}
+      errorMessage={reservationErrorMessage}
+    />
+  );
 
   if (!reservation) {
     return (
       <div className="space-y-6">
+        {debugInfo}
         <PageHeader
           title="予約が見つかりません"
           description="指定された予約は存在しないか、削除されています。"
@@ -65,6 +77,8 @@ export default async function ReservationDetailPage({
 
   return (
     <div className="space-y-6">
+      {debugInfo}
+
       {query?.created === "1" ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
           予約を登録しました。この画面で暗証番号、メール送信、備考まで続けて管理できます。
@@ -200,6 +214,27 @@ export default async function ReservationDetailPage({
             </CardContent>
           </Card>
         </aside>
+      </div>
+    </div>
+  );
+}
+
+function ReservationDebugInfo({
+  paramsId,
+  reservationCount,
+  errorMessage,
+}: {
+  paramsId: string;
+  reservationCount: number;
+  errorMessage: string | null;
+}) {
+  return (
+    <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+      <div className="font-semibold">デバッグ情報</div>
+      <div className="mt-2 grid gap-1">
+        <div>params.id: {paramsId}</div>
+        <div>取得件数: {reservationCount}</div>
+        <div>取得エラー内容: {errorMessage ?? "なし"}</div>
       </div>
     </div>
   );
